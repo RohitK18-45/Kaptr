@@ -69,6 +69,8 @@ if (!COOKIES && process.env.YOUTUBE_COOKIES) {
 }
 
 const PROXY = process.env.YTDLP_PROXY || process.env.HTTP_PROXY || process.env.HTTPS_PROXY || "";
+const AUTO_SHUTDOWN = process.env.AUTO_SHUTDOWN === "1" || process.env.AUTO_SHUTDOWN === "true" || process.argv.includes("--auto-shutdown");
+let lastHeartbeat = Date.now();
 const MAX_AGE = 1000 * 60 * 60 * 2; // 2 hours
 const JOB_TIMEOUT = 1000 * 60 * 30;
 
@@ -568,13 +570,25 @@ const server = http.createServer(async (req, res) => {
 
   try {
     if (p === "/api/health" && req.method === "GET") {
+      lastHeartbeat = Date.now();
       return json(res, 200, {
         ok: true,
         ytdlp: engine.ytdlp,
         ffmpeg: engine.ffmpeg,
         ytdlpVersion: engine.ytdlpVersion,
         cookies: Boolean(COOKIES),
+        autoShutdown: AUTO_SHUTDOWN,
       });
+    }
+
+    if (p === "/api/heartbeat" && req.method === "POST") {
+      lastHeartbeat = Date.now();
+      return json(res, 200, { ok: true, autoShutdown: AUTO_SHUTDOWN });
+    }
+
+    if (p === "/api/leave" && req.method === "POST") {
+      lastHeartbeat = Date.now() - 8000;
+      return json(res, 200, { ok: true });
     }
 
     if (p === "/api/info" && req.method === "POST") {
@@ -685,6 +699,9 @@ setInterval(async () => {
 
   server.listen(PORT, HOST, () => {
     console.log(`  → http://localhost:${PORT}`);
+    if (AUTO_SHUTDOWN) {
+      console.log("  ✓ auto-shutdown active (shuts down when browser tab closes)");
+    }
     if (!engine.ytdlp) {
       console.log("  ! demo mode — install yt-dlp for real downloads");
     }
@@ -694,6 +711,28 @@ setInterval(async () => {
     if (COOKIES) console.log(`  ✓ cookies: ${COOKIES}`);
     console.log("  stop with Ctrl+C\n");
   });
+
+  if (AUTO_SHUTDOWN) {
+    const GRACE_PERIOD = 20000; // 20s initial grace period for browser to open
+    const startTime = Date.now();
+    setInterval(() => {
+      if (Date.now() - startTime < GRACE_PERIOD) return;
+
+      // Don't shut down if a download is active
+      for (const [, job] of jobs) {
+        if (job.status === "downloading" || job.status === "queued") {
+          lastHeartbeat = Date.now();
+          return;
+        }
+      }
+
+      // If no heartbeat for > 10 seconds, shut down
+      if (Date.now() - lastHeartbeat > 10000) {
+        console.log("\n  [auto-shutdown] Browser closed. Shutting down Kaptr cleanly.\n");
+        process.exit(0);
+      }
+    }, 2000).unref();
+  }
 })();
 
 server.on("error", (err) => {

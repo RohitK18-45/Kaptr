@@ -1189,9 +1189,23 @@
     renderHistoryBadge();
     updateEngineUI();
     checkEngine();
+    initHeartbeat();
 
     const year = $("#year");
     if (year) year.textContent = String(new Date().getFullYear());
+  }
+
+  function initHeartbeat() {
+    function ping() {
+      fetch("/api/heartbeat", { method: "POST", keepalive: true }).catch(() => {});
+    }
+    ping();
+    setInterval(ping, 4000);
+    window.addEventListener("pagehide", () => {
+      try {
+        if (navigator.sendBeacon) navigator.sendBeacon("/api/leave");
+      } catch {}
+    });
   }
 
   if (document.readyState === "loading") {
