@@ -1,0 +1,522 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Kaptr — Keep every pixel</title>
+  <meta name="description" content="Grab YouTube and Instagram video in the highest quality available. Up to 8K, no watermark, no re-encode. Local-first, no sign-up." />
+  <meta name="theme-color" content="#06060a" />
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Kaptr" />
+  <meta property="og:title" content="Kaptr — Keep every pixel" />
+  <meta property="og:description" content="Paste a YouTube or Instagram link. Keep the original stream — up to 8K, watermark-free, local-first." />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Kaptr — Keep every pixel" />
+  <meta name="twitter:description" content="Paste a YouTube or Instagram link. Keep the original stream — up to 8K, watermark-free, local-first." />
+  <meta name="color-scheme" content="dark light" />
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%238b5cf6'/%3E%3Cpath d='M26 20l16 12-16 12z' fill='white'/%3E%3C/svg%3E" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <noscript><style>.reveal { opacity: 1 !important; transform: none !important; }</style></noscript>
+</head>
+<body>
+  <div class="scroll-progress" aria-hidden="true"><span id="scrollBar"></span></div>
+  <div class="spotlight" id="spotlight" aria-hidden="true"></div>
+
+  <div class="aurora" aria-hidden="true">
+    <div class="blob blob-a"></div>
+    <div class="blob blob-b"></div>
+    <div class="blob blob-c"></div>
+    <div class="grid-veil"></div>
+    <div class="grain"></div>
+  </div>
+
+  <header class="nav-shell">
+    <nav class="nav" id="nav" aria-label="Main">
+      <a class="brand" href="#top" aria-label="Kaptr home">
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 32 32" fill="none">
+            <path d="M11 8.5 23.5 16 11 23.5V8.5Z" fill="currentColor"/>
+            <path d="M7 8.5v15" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" opacity=".55"/>
+          </svg>
+        </span>
+        <span class="brand-name">kaptr<span>.</span></span>
+      </a>
+
+      <div class="nav-links">
+        <a href="#features">Features</a>
+        <a href="#how">How it works</a>
+        <a href="#faq">FAQ</a>
+      </div>
+
+      <div class="nav-actions">
+        <button class="icon-btn" id="themeBtn" type="button" aria-label="Switch to light theme" title="Toggle theme">
+          <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round">
+            <circle cx="12" cy="12" r="4.2"/><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5.3 5.3l1.4 1.4M17.3 17.3l1.4 1.4M18.7 5.3l-1.4 1.4M6.7 17.3l-1.4 1.4"/>
+          </svg>
+          <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20.5 14.2A8.5 8.5 0 0 1 9.8 3.5 8.6 8.6 0 1 0 20.5 14.2Z"/>
+          </svg>
+        </button>
+        <button class="btn btn-ghost btn-sm history-trigger" id="historyBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3.5 12a8.5 8.5 0 1 0 2.6-6.1"/><path d="M3.5 4.5V9H8"/><path d="M12 7.5V12l3 1.8"/>
+          </svg>
+          <span class="history-label">History</span>
+          <span class="count-badge" id="historyCount">0</span>
+        </button>
+        <a href="#grabber" class="btn btn-primary btn-sm nav-cta" data-scroll-to="grabber">
+          Grab a video
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h13M12 5l7 7-7 7"/></svg>
+        </a>
+      </div>
+    </nav>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" id="top">
+      <div class="hero-inner">
+        <div class="eyebrow reveal">
+          <span class="pulse-dot" aria-hidden="true"></span>
+          <span>Up to 8K · HDR ready</span>
+          <span class="eyebrow-rule" aria-hidden="true"></span>
+          <span class="mono">no sign-up, ever</span>
+        </div>
+
+        <h1 class="hero-title reveal" data-delay="1">
+          Keep every<br />
+          <span class="line-two">pixel<span class="title-dot">.</span></span>
+          <em class="hero-em">Every&nbsp;frame.</em>
+        </h1>
+
+        <p class="lede reveal" data-delay="2">
+          Drop a YouTube or Instagram link. Kaptr pulls the original stream — up to 8K,
+          no watermark, no re-encode. Your links never leave your machine.
+        </p>
+
+        <!-- GRABBER -->
+        <div class="grabber reveal" id="grabber" data-delay="3">
+          <div class="grabber-glow" aria-hidden="true"></div>
+
+          <div class="grabber-top">
+            <div class="source-tabs" role="tablist" aria-label="Source">
+              <button class="source is-active" type="button" data-source="auto" role="tab" aria-selected="true">Auto</button>
+              <button class="source" type="button" data-source="youtube" role="tab" aria-selected="false">
+                <svg class="source-ico" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M21.6 7.2a2.8 2.8 0 0 0-2-2C17.9 4.8 12 4.8 12 4.8s-5.9 0-7.6.4a2.8 2.8 0 0 0-2 2A29 29 0 0 0 2 12a29 29 0 0 0 .4 4.8 2.8 2.8 0 0 0 2 2c1.7.4 7.6.4 7.6.4s5.9 0 7.6-.4a2.8 2.8 0 0 0 2-2A29 29 0 0 0 22 12a29 29 0 0 0-.4-4.8ZM10 15.2V8.8l5.3 3.2L10 15.2Z"/></svg>
+                YouTube
+              </button>
+              <button class="source" type="button" data-source="instagram" role="tab" aria-selected="false">
+                <svg class="source-ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="5.5"/><circle cx="12" cy="12" r="4"/><circle cx="17.2" cy="6.8" r="1.2" fill="currentColor" stroke="none"/></svg>
+                Instagram
+              </button>
+            </div>
+
+            <button class="status-pill" id="statusPill" type="button" aria-live="polite">
+              <span class="status-dot" aria-hidden="true"></span>
+              <span id="statusText">checking local engine…</span>
+            </button>
+          </div>
+
+          <form class="url-row" id="urlForm" novalidate>
+            <div class="url-field" id="urlField">
+              <span class="url-icon" id="urlIcon" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 14.5 14.5 9.5"/><path d="M7 17H5.5a3.5 3.5 0 0 1 0-7H9"/><path d="M17 7h1.5a3.5 3.5 0 0 1 0 7H15"/></svg>
+              </span>
+              <input
+                id="urlInput"
+                name="url"
+                type="text"
+                inputmode="url"
+                placeholder="Paste a YouTube or Instagram link…"
+                autocomplete="off"
+                autocapitalize="off"
+                spellcheck="false"
+                aria-label="Video link"
+              />
+              <span class="url-shortcut" aria-hidden="true"><kbd>⌘</kbd><kbd>K</kbd></span>
+              <button class="paste-btn" id="pasteBtn" type="button" title="Paste from clipboard">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="4" width="11" height="16" rx="2.5"/><path d="M8 6H6.5A1.5 1.5 0 0 0 5 7.5v12A1.5 1.5 0 0 0 6.5 21H8"/><path d="M11 4.5h5"/></svg>
+                <span>Paste</span>
+              </button>
+            </div>
+
+            <button class="btn btn-primary grab-btn" id="grabBtn" type="submit">
+              <span class="btn-label">Grab video</span>
+              <span class="btn-arrow" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v12"/><path d="m6.5 10.5 5.5 5.5 5.5-5.5"/></svg>
+              </span>
+              <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
+          </form>
+
+          <div class="grabber-foot">
+            <div class="quick-chips">
+              <span class="foot-label">Works with</span>
+              <button class="mini-chip" type="button" data-example="youtube">YouTube</button>
+              <button class="mini-chip" type="button" data-example="shorts">Shorts</button>
+              <button class="mini-chip" type="button" data-example="instagram">Reels</button>
+              <button class="mini-chip" type="button" data-example="instagram-post">IG posts</button>
+            </div>
+            <span class="secure-note" id="secureNote">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3 5 6v5.5c0 4.3 2.9 7.7 7 9.5 4.1-1.8 7-5.2 7-9.5V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+              Links stay local
+            </span>
+          </div>
+
+          <!-- RESULT AREA -->
+          <div class="result-shell" id="resultShell" hidden>
+            <div class="result-skeleton" id="resultSkeleton" hidden>
+              <div class="sk-thumb shimmer"></div>
+              <div class="sk-body">
+                <div class="sk-line shimmer w-70"></div>
+                <div class="sk-line shimmer w-40"></div>
+                <div class="sk-chips">
+                  <div class="sk-chip shimmer"></div>
+                  <div class="sk-chip shimmer"></div>
+                  <div class="sk-chip shimmer"></div>
+                </div>
+              </div>
+            </div>
+            <div class="result" id="result" hidden></div>
+          </div>
+        </div>
+
+        <div class="trust-row reveal" data-delay="4">
+          <span>Built for</span>
+          <div class="trust-items">
+            <span>creators</span><span class="trust-dot"></span>
+            <span>editors</span><span class="trust-dot"></span>
+            <span>archivists</span><span class="trust-dot"></span>
+            <span>researchers</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="hero-fade" aria-hidden="true"></div>
+    </section>
+
+    <!-- FEATURES BENTO -->
+    <section class="section" id="features">
+      <div class="section-head">
+        <span class="kicker reveal"><span class="kicker-line"></span>01 — Why Kaptr</span>
+        <h2 class="section-title reveal">Quality isn't a setting.<br /><em>It's the default.</em></h2>
+        <p class="section-sub reveal">The pipeline is built around one rule: never throw away what the uploader gave us.</p>
+      </div>
+
+      <div class="bento">
+        <article class="bento-card card-quality reveal">
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="3"/><path d="M7 9h3M7 12h2"/><path d="m15 9 4 3-4 3V9Z" fill="currentColor" stroke="none"/></svg>
+            </span>
+            <span class="card-tag mono">native streams</span>
+          </div>
+          <h3>Up to 8K, straight from source</h3>
+          <p>Kaptr grabs the original video and audio streams and remuxes them — no screen capture, no quality loss.</p>
+          <div class="res-ladder" aria-hidden="true">
+            <div class="res-row is-best"><span class="res-name">4320p</span><span class="res-bar"><i style="--w:100%"></i></span><span class="res-badge">8K</span></div>
+            <div class="res-row"><span class="res-name">2160p</span><span class="res-bar"><i style="--w:72%"></i></span><span class="res-badge">4K</span></div>
+            <div class="res-row"><span class="res-name">1440p</span><span class="res-bar"><i style="--w:52%"></i></span><span class="res-badge">2K</span></div>
+            <div class="res-row"><span class="res-name">1080p</span><span class="res-bar"><i style="--w:34%"></i></span><span class="res-badge">HD</span></div>
+          </div>
+        </article>
+
+        <article class="bento-card card-audio reveal">
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V6l10-2v12"/><circle cx="6.5" cy="18" r="2.5"/><circle cx="16.5" cy="16" r="2.5"/></svg>
+            </span>
+            <span class="card-tag mono">mp3 · m4a</span>
+          </div>
+          <h3>Just the sound</h3>
+          <p>Strip any video down to a clean audio track, ready for your edit.</p>
+          <div class="waveform" aria-hidden="true">
+            <b style="--h:30%"></b><b style="--h:62%"></b><b style="--h:44%"></b><b style="--h:88%"></b><b style="--h:56%"></b><b style="--h:100%"></b><b style="--h:70%"></b><b style="--h:38%"></b><b style="--h:82%"></b><b style="--h:52%"></b><b style="--h:94%"></b><b style="--h:42%"></b><b style="--h:66%"></b><b style="--h:28%"></b><b style="--h:74%"></b><b style="--h:48%"></b>
+          </div>
+        </article>
+
+        <article class="bento-card card-clean reveal">
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="m12 3 8 4.5v9L12 21l-8-4.5v-9L12 3Z"/><path d="m4 7.5 8 4.5 8-4.5M12 12v9"/></svg>
+            </span>
+            <span class="card-tag mono">watermark-free</span>
+          </div>
+          <h3>Clean frames only</h3>
+          <p>No badges, no re-encode pass, no added overlays. What you get is exactly what was uploaded.</p>
+          <div class="layer-stack" aria-hidden="true">
+            <span class="layer l1"></span>
+            <span class="layer l2"></span>
+            <span class="layer l3"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 12.5 4 4 8-9"/></svg></span>
+          </div>
+        </article>
+
+        <article class="bento-card card-queue reveal">
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11M4 12h11M4 18h7"/><path d="m17 14 3 2.5-3 2.5v-5Z" fill="currentColor" stroke="none"/></svg>
+            </span>
+            <span class="card-tag mono">queue</span>
+          </div>
+          <h3>Line them up</h3>
+          <p>Paste a whole folder's worth of links. Kaptr works through them one at a time.</p>
+          <div class="queue-mini" aria-hidden="true">
+            <div class="q-item"><span class="q-thumb q1"></span><span class="q-lines"><i></i><i></i></span><span class="q-state done">done</span></div>
+            <div class="q-item"><span class="q-thumb q2"></span><span class="q-lines"><i></i><i></i></span><span class="q-state live">64%</span></div>
+            <div class="q-item"><span class="q-thumb q3"></span><span class="q-lines"><i></i><i></i></span><span class="q-state">next</span></div>
+          </div>
+        </article>
+
+        <article class="bento-card card-private reveal">
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 5 6v5.5c0 4.3 2.9 7.7 7 9.5 4.1-1.8 7-5.2 7-9.5V6l-7-3Z"/><path d="m9 12 2 2 4-4"/></svg>
+            </span>
+            <span class="card-tag mono">local-first</span>
+          </div>
+          <h3>Your links aren't our data</h3>
+          <p>No accounts. No tracking pixels. The engine runs next to you, not on a server farm.</p>
+          <div class="privacy-orbit" aria-hidden="true">
+            <span class="orbit-ring"></span>
+            <span class="orbit-core">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="10" width="14" height="10" rx="3"/><path d="M8.5 10V7.5a3.5 3.5 0 0 1 7 0V10"/></svg>
+            </span>
+            <span class="orbit-dot od1"></span>
+            <span class="orbit-dot od2"></span>
+            <span class="orbit-dot od3"></span>
+          </div>
+        </article>
+
+        <article class="bento-card card-speed reveal">
+          <div class="card-top">
+            <span class="card-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4.5 13.5H11l-1 8.5 8.5-11.5H12l1-8.5Z"/></svg>
+            </span>
+            <span class="card-tag mono">parallel</span>
+          </div>
+          <h3>Fast, even on 4K</h3>
+          <p>Fragments download in parallel. A ten-minute 4K clip typically lands in under a minute.</p>
+          <div class="speed-stat" aria-hidden="true">
+            <span class="speed-num" data-counter="24" data-suffix="×">0×</span>
+            <span class="speed-label">faster than realtime</span>
+            <div class="speed-spark"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- HOW IT WORKS -->
+    <section class="section" id="how">
+      <div class="section-head split">
+        <div>
+          <span class="kicker reveal"><span class="kicker-line"></span>02 — The flow</span>
+          <h2 class="section-title reveal">Three steps.<br /><em>Zero friction.</em></h2>
+        </div>
+        <p class="section-sub reveal">No account. No queue on someone else's server. No "upgrade to 1080p" paywall waiting at the end.</p>
+      </div>
+
+      <div class="steps">
+        <div class="steps-line" aria-hidden="true"><span></span></div>
+        <article class="step reveal">
+          <span class="step-num mono">01</span>
+          <div class="step-body">
+            <h3>Paste the link</h3>
+            <p>Copy any YouTube, Shorts, Instagram Reel or post URL. Kaptr detects the source the moment it lands.</p>
+          </div>
+          <div class="step-visual">
+            <div class="mini-url"><span class="mini-url-dot"></span><span class="mini-url-text">youtube.com/watch?v=…</span><span class="mini-url-ok">✓</span></div>
+          </div>
+        </article>
+
+        <article class="step reveal">
+          <span class="step-num mono">02</span>
+          <div class="step-body">
+            <h3>Pick your quality</h3>
+            <p>Every stream the source exposes is listed — 8K down to 480p, plus a clean audio-only track.</p>
+          </div>
+          <div class="step-visual">
+            <div class="mini-quality"><span class="mq">8K</span><span class="mq active">4K</span><span class="mq">1080p</span><span class="mq">MP3</span></div>
+          </div>
+        </article>
+
+        <article class="step reveal">
+          <span class="step-num mono">03</span>
+          <div class="step-body">
+            <h3>Keep the file</h3>
+            <p>Watch the progress ring fill, then the file lands in your downloads. Yours, offline, forever.</p>
+          </div>
+          <div class="step-visual">
+            <div class="mini-ring" style="--p:76">
+              <svg viewBox="0 0 44 44" aria-hidden="true">
+                <circle class="ring-bg" cx="22" cy="22" r="18"/>
+                <circle class="ring-fg" cx="22" cy="22" r="18"/>
+              </svg>
+              <span>76%</span>
+            </div>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- STATS -->
+    <section class="stats-strip reveal" aria-label="Stats">
+      <div class="stat">
+        <span class="stat-num"><span data-counter="8" data-suffix="K">0K</span></span>
+        <span class="stat-label">max resolution</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num"><span data-counter="0">0</span></span>
+        <span class="stat-label">sign-ups required</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num"><span data-counter="3">0</span></span>
+        <span class="stat-label">clicks, start to file</span>
+      </div>
+      <div class="stat">
+        <span class="stat-num"><span data-counter="100" data-suffix="%">0%</span></span>
+        <span class="stat-label">local &amp; private</span>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section" id="faq">
+      <div class="section-head split">
+        <div>
+          <span class="kicker reveal"><span class="kicker-line"></span>03 — Questions</span>
+          <h2 class="section-title reveal">Good to<br /><em>know.</em></h2>
+        </div>
+        <p class="section-sub reveal">The short, honest answers. Including the one about permission.</p>
+      </div>
+
+      <div class="faq" id="faqList">
+        <div class="faq-item reveal">
+          <button class="faq-q" type="button" aria-expanded="false">
+            <span>What's the highest quality I can get?</span>
+            <span class="faq-icon" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="faq-a"><div><p>Whatever the source exposes. YouTube often publishes 2160p (4K) and sometimes 4320p (8K); Instagram usually tops out at 1080p for Reels. Kaptr lists only the real streams — it never upscales or fakes a higher resolution.</p></div></div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-q" type="button" aria-expanded="false">
+            <span>Do I need to install anything?</span>
+            <span class="faq-icon" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="faq-a"><div><p>The interface works instantly in your browser. Real downloads come from a tiny local engine (<code>yt-dlp</code> + <code>ffmpeg</code>) started with <code>node server.js</code>. Until that's running, the app previews results in demo mode and tells you clearly when a file isn't real.</p></div></div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-q" type="button" aria-expanded="false">
+            <span>Why Instagram sometimes asks for a login</span>
+            <span class="faq-icon" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="faq-a"><div><p>Instagram restricts a lot of content to signed-in viewers. Public posts usually resolve without cookies; private or age-gated posts need your own exported cookies. Kaptr supports a local cookies file — it is never uploaded anywhere.</p></div></div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-q" type="button" aria-expanded="false">
+            <span>Is my data collected?</span>
+            <span class="faq-icon" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="faq-a"><div><p>No analytics, no accounts, no server-side history. Downloads and your local history list live in your browser and on your disk. The only outbound requests are the ones needed to fetch the video you asked for.</p></div></div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-q" type="button" aria-expanded="false">
+            <span>Is downloading videos allowed?</span>
+            <span class="faq-icon" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="faq-a"><div><p>Only if you have the right to do so. Use Kaptr for your own uploads, content published under a permissive licence, or material you have explicit permission to save. Downloading copyrighted work without permission may breach copyright law and the platform's terms. You are responsible for what you download.</p></div></div>
+        </div>
+
+        <div class="faq-item reveal">
+          <button class="faq-q" type="button" aria-expanded="false">
+            <span>Do downloads have watermarks or ads?</span>
+            <span class="faq-icon" aria-hidden="true"><i></i><i></i></span>
+          </button>
+          <div class="faq-a"><div><p>Never. Kaptr doesn't inject anything — no branding, no pre-roll, no "downloaded with" badge. Private-platform watermarks that are baked into the source video cannot be removed, and Kaptr won't pretend otherwise.</p></div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="cta-section">
+      <div class="cta-card reveal">
+        <div class="cta-glow" aria-hidden="true"></div>
+        <span class="kicker center"><span class="kicker-line"></span>Your copy, in full fidelity<span class="kicker-line"></span></span>
+        <h2>Paste a link.<br /><em>Keep the quality.</em></h2>
+        <p>No upload limits, no resolution paywall, no account to forget the password to.</p>
+        <a href="#grabber" class="btn btn-primary btn-lg" data-scroll-to="grabber">
+          Grab your first video
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v12"/><path d="m6.5 10.5 5.5 5.5 5.5-5.5"/></svg>
+        </a>
+        <span class="cta-note mono">free · no sign-up · works offline after setup</span>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-main">
+      <div class="footer-brand">
+        <a class="brand" href="#top">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none"><path d="M11 8.5 23.5 16 11 23.5V8.5Z" fill="currentColor"/><path d="M7 8.5v15" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" opacity=".55"/></svg>
+          </span>
+          <span class="brand-name">kaptr<span>.</span></span>
+        </a>
+        <p>High-fidelity video capture for people who care about the frame.</p>
+      </div>
+      <div class="footer-cols">
+        <div class="footer-col">
+          <h3>Product</h3>
+          <a href="#features">Features</a>
+          <a href="#how">How it works</a>
+          <a href="#faq">FAQ</a>
+        </div>
+        <div class="footer-col">
+          <h3>Engine</h3>
+          <a href="https://github.com/yt-dlp/yt-dlp" target="_blank" rel="noopener">yt-dlp</a>
+          <a href="https://ffmpeg.org" target="_blank" rel="noopener">ffmpeg</a>
+          <a href="README.md" target="_blank" rel="noopener">Setup guide</a>
+        </div>
+        <div class="footer-col">
+          <h3>Fair use</h3>
+          <a href="#faq">Permissions</a>
+          <a href="#faq">Copyright</a>
+          <a href="#faq">Privacy</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>© <span id="year">2026</span> Kaptr. Download only what you own or have permission to use.</p>
+      <p class="mono footer-built">built local-first<span class="blink">_</span></p>
+    </div>
+  </footer>
+
+  <!-- HISTORY DRAWER -->
+  <div class="drawer-backdrop" id="drawerBackdrop" hidden></div>
+  <aside class="drawer" id="historyDrawer" aria-label="Download history" aria-hidden="true" hidden>
+    <div class="drawer-head">
+      <div>
+        <span class="kicker"><span class="kicker-line"></span>Local</span>
+        <h3>Recent grabs</h3>
+      </div>
+      <button class="icon-btn" id="closeDrawer" type="button" aria-label="Close history">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="m6 6 12 12M18 6 6 18"/></svg>
+      </button>
+    </div>
+    <div class="drawer-list" id="historyList"></div>
+    <div class="drawer-foot">
+      <button class="btn btn-ghost btn-sm" id="clearHistory" type="button">Clear history</button>
+      <p class="mono">stored in this browser only</p>
+    </div>
+  </aside>
+
+  <div class="toasts" id="toasts" aria-live="polite" aria-atomic="false"></div>
+
+  <script src="app.js"></script>
+</body>
+</html>

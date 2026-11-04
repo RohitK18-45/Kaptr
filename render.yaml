@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: kaptr
+    env: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    envVars:
+      - key: PORT
+        value: 3000
+      - key: HOST
+        value: 0.0.0.0
