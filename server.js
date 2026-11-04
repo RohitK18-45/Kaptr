@@ -20,7 +20,7 @@ const os = require("node:os");
 const crypto = require("node:crypto");
 const { spawn, execFile } = require("node:child_process");
 
-const PORT = Number(process.env.PORT || 3000);
+const PORT = Number(process.env.PORT || 80);
 const HOST = process.env.HOST || "0.0.0.0";
 const ROOT = __dirname;
 const TMP_ROOT = path.join(os.tmpdir(), "kaptr-jobs");
@@ -698,7 +698,8 @@ setInterval(async () => {
   ]);
 
   server.listen(PORT, HOST, () => {
-    console.log(`  → http://localhost:${PORT}`);
+    const urlStr = PORT === 80 ? "http://kaptr.local" : `http://kaptr.local:${PORT}`;
+    console.log(`  → ${urlStr} (or http://localhost:${PORT})`);
     if (AUTO_SHUTDOWN) {
       console.log("  ✓ auto-shutdown active (shuts down when browser tab closes)");
     }
@@ -736,6 +737,13 @@ setInterval(async () => {
 })();
 
 server.on("error", (err) => {
+  if ((err.code === "EACCES" || err.code === "EADDRINUSE") && PORT === 80) {
+    console.warn(`\n  ! Port 80 not available, falling back to port 3000...\n`);
+    server.listen(3000, HOST, () => {
+      console.log(`  → http://kaptr.local:3000 (or http://localhost:3000)\n`);
+    });
+    return;
+  }
   if (err.code === "EADDRINUSE") {
     console.error(`\n  Port ${PORT} is busy. Try:  PORT=3001 node server.js\n`);
   } else {
