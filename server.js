@@ -201,12 +201,36 @@ function detectBinary(bin, args, key, versionKey) {
 /* yt-dlp info                                                         */
 /* ------------------------------------------------------------------ */
 
+function cleanVideoUrl(rawUrl) {
+  try {
+    const u = new URL(rawUrl);
+    const host = u.hostname.replace(/^www\./, "").toLowerCase();
+    if (host === "youtu.be") {
+      const id = u.pathname.split("/")[1];
+      if (id && /^[\w-]{11}$/.test(id)) return `https://www.youtube.com/watch?v=${id}`;
+    }
+    if (host === "youtube.com" || host.endsWith(".youtube.com")) {
+      const v = u.searchParams.get("v");
+      if (v && /^[\w-]{11}$/.test(v)) return `https://www.youtube.com/watch?v=${v}`;
+      const m = u.pathname.match(/\/(?:shorts|embed|live|v)\/([\w-]{11})/);
+      if (m) return `https://www.youtube.com/watch?v=${m[1]}`;
+    }
+    return rawUrl;
+  } catch {
+    return rawUrl;
+  }
+}
+
 function ytdlpInfo(url) {
   return new Promise((resolve, reject) => {
+    const clean = cleanVideoUrl(url);
     const args = [
-      "-J", "--no-warnings", "--no-playlist", "--socket-timeout", "15",
+      "-J", "--no-warnings", "--no-playlist", "--socket-timeout", "25",
+      "--js-runtimes", `node:${process.execPath}`,
+      "--remote-components", "ejs:github",
+      "--extractor-args", "youtube:player_client=default,web,android",
       ...(COOKIES ? ["--cookies", COOKIES] : []),
-      url,
+      clean,
     ];
     execFile(
       YTDLP,
@@ -361,12 +385,16 @@ async function startJob({ url, height, format, abr, title }) {
   };
   jobs.set(id, job);
 
+  const clean = cleanVideoUrl(url);
   const h = Math.max(0, Math.min(4320, Number(height) || 1080));
   let selector;
   const args = [
     "--no-playlist", "--no-warnings", "--newline", "--no-part",
     "--restrict-filenames", "--concurrent-fragments", "4",
-    "--socket-timeout", "20", "--retries", "4",
+    "--socket-timeout", "25", "--retries", "4",
+    "--js-runtimes", `node:${process.execPath}`,
+    "--remote-components", "ejs:github",
+    "--extractor-args", "youtube:player_client=default,web,android",
     "--progress-template", "download:KAPTR %(progress._percent_str)s|%(progress._speed_str)s|%(progress._eta_str)s|%(progress._total_bytes_estimate_str)s",
     ...(COOKIES ? ["--cookies", COOKIES] : []),
   ];
@@ -388,7 +416,7 @@ async function startJob({ url, height, format, abr, title }) {
     args.push("-f", selector, "--merge-output-format", "mp4/mkv");
   }
 
-  args.push("-o", path.join(dir, "video.%(ext)s"), url);
+  args.push("-o", path.join(dir, "video.%(ext)s"), clean);
 
   const ext = format === "mp3" ? ".mp3" : ".mp4";
   job.filename = `${job.title}${ext}`;

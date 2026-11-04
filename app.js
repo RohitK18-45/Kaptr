@@ -284,7 +284,8 @@
       if (host === "youtube.com" && !id && !/\/(shorts|embed|live)\//.test(url.pathname)) {
         return { platform: "youtube", id: null, url: url.toString(), unsure: true };
       }
-      return { platform: "youtube", id: id || null, url: url.toString() };
+      const cleanUrl = id ? `https://www.youtube.com/watch?v=${id}` : url.toString();
+      return { platform: "youtube", id: id || null, url: cleanUrl };
     }
 
     if (host === "instagram.com" || host.endsWith(".instagram.com") || host === "instagr.am") {
