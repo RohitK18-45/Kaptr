@@ -9,3 +9,5 @@ services:
         value: 3000
       - key: HOST
         value: 0.0.0.0
+      - key: YOUTUBE_COOKIES
+        sync: false

@@ -56,7 +56,19 @@ function getFfmpegLocation() {
 
 const YTDLP = resolveBinary("yt-dlp");
 const FFMPEG = resolveBinary("ffmpeg");
-const COOKIES = process.env.COOKIES_FILE || "";
+
+let COOKIES = process.env.COOKIES_FILE || "";
+if (!COOKIES && process.env.YOUTUBE_COOKIES) {
+  try {
+    const cookiePath = path.join(os.tmpdir(), "youtube_cookies.txt");
+    fs.writeFileSync(cookiePath, process.env.YOUTUBE_COOKIES, "utf8");
+    COOKIES = cookiePath;
+  } catch (err) {
+    console.warn("Could not write YOUTUBE_COOKIES to disk:", err.message);
+  }
+}
+
+const PROXY = process.env.YTDLP_PROXY || process.env.HTTP_PROXY || process.env.HTTPS_PROXY || "";
 const MAX_AGE = 1000 * 60 * 60 * 2; // 2 hours
 const JOB_TIMEOUT = 1000 * 60 * 30;
 
@@ -169,7 +181,11 @@ function humanBytes(n) {
 }
 
 function cleanErr(text) {
-  return String(text || "")
+  const str = String(text || "");
+  if (/Failed to extract any player response|Sign in to confirm you(?:'|&#39;)re not a bot/i.test(str)) {
+    return "YouTube blocked this cloud server IP (anti-bot protection). Provide YouTube cookies via YOUTUBE_COOKIES env var on Render, or use Kaptr locally.";
+  }
+  return str
     .split(/\r?\n/)
     .map((l) => l.trim())
     .filter(Boolean)
@@ -228,7 +244,11 @@ function ytdlpInfo(url) {
       "-J", "--no-warnings", "--no-playlist", "--socket-timeout", "25",
       "--js-runtimes", `node:${process.execPath}`,
       "--remote-components", "ejs:github",
-      "--extractor-args", "youtube:player_client=default,web,android",
+      "--extractor-args", "youtube:player_client=web_embedded,android,web",
+      "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+      "--referer", "https://www.youtube.com/",
+      "--add-header", "Accept-Language:en-US,en;q=0.9",
+      ...(PROXY ? ["--proxy", PROXY] : []),
       ...(COOKIES ? ["--cookies", COOKIES] : []),
       clean,
     ];
@@ -394,8 +414,12 @@ async function startJob({ url, height, format, abr, title }) {
     "--socket-timeout", "25", "--retries", "4",
     "--js-runtimes", `node:${process.execPath}`,
     "--remote-components", "ejs:github",
-    "--extractor-args", "youtube:player_client=default,web,android",
+    "--extractor-args", "youtube:player_client=web_embedded,android,web",
+    "--user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36",
+    "--referer", "https://www.youtube.com/",
+    "--add-header", "Accept-Language:en-US,en;q=0.9",
     "--progress-template", "download:KAPTR %(progress._percent_str)s|%(progress._speed_str)s|%(progress._eta_str)s|%(progress._total_bytes_estimate_str)s",
+    ...(PROXY ? ["--proxy", PROXY] : []),
     ...(COOKIES ? ["--cookies", COOKIES] : []),
   ];
 
