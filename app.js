@@ -820,19 +820,21 @@
         });
 
         if (job.status === "done") {
+          const directUrl = `/api/file/${jobId}`;
+          const finalFilename = job.filename || "kaptr-video.mp4";
           setDownloadState({
             percent: 100,
             label: "Saved",
-            status: `<span>${esc(job.filename || "Video")}${job.size ? ` · ${esc(fmtBytesShort(job.size))}` : ""} · saved to downloads</span><span class="bar"><i style="width:100%"></i></span>`,
+            status: `<span>${esc(finalFilename)}${job.size ? ` · ${esc(fmtBytesShort(job.size))}` : ""} · <a href="${directUrl}" download="${esc(finalFilename)}" style="color:var(--accent);text-decoration:underline;font-weight:600;">Download ready</a></span><span class="bar"><i style="width:100%"></i></span>`,
             done: true,
           });
           btn?.classList.add("done");
           const a = document.createElement("a");
-          a.href = `/api/file/${jobId}`;
-          a.download = job.filename || "kaptr-video.mp4";
+          a.href = directUrl;
+          a.download = finalFilename;
           document.body.appendChild(a);
           a.click();
-          a.remove();
+          setTimeout(() => a.remove(), 1000);
 
           addHistory({
             url: info.url || info.webpageUrl,

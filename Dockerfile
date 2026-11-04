@@ -1,19 +1,21 @@
-FROM node:20-alpine
+FROM node:20-bookworm-slim
 
-# Install ffmpeg, python, curl, ca-certificates
-RUN apk add --no-cache \
+# Install ffmpeg, python3, curl and certificates
+RUN apt-get update && apt-get install -y --no-install-recommends \
     ffmpeg \
     python3 \
+    python3-pip \
     curl \
-    ca-certificates
+    ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
-# Install latest yt-dlp binary
+# Install official yt-dlp binary (runs natively on Debian glibc)
 RUN curl -L https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp -o /usr/local/bin/yt-dlp \
-    && chmod a+rx /usr/local/bin/yt-dlp
+ && chmod a+rx /usr/local/bin/yt-dlp
 
 WORKDIR /app
 
-# Copy app files
+# Copy application files
 COPY package.json ./
 COPY server.js ./
 COPY index.html ./

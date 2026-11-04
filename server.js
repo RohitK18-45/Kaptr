@@ -29,8 +29,33 @@ const LOCAL_BIN = path.join(ROOT, "bin");
 if (fs.existsSync(LOCAL_BIN)) {
   process.env.PATH = LOCAL_BIN + path.delimiter + (process.env.PATH || "");
 }
-const YTDLP = process.env.YTDLP_PATH || "yt-dlp";
-const FFMPEG = process.env.FFMPEG_PATH || "ffmpeg";
+
+function resolveBinary(name) {
+  if (name === "ffmpeg") {
+    if (process.env.FFMPEG_PATH) return process.env.FFMPEG_PATH;
+    const local = path.join(LOCAL_BIN, process.platform === "win32" ? "ffmpeg.exe" : "ffmpeg");
+    if (fs.existsSync(local)) return local;
+    return "ffmpeg";
+  }
+  if (name === "yt-dlp") {
+    if (process.env.YTDLP_PATH) return process.env.YTDLP_PATH;
+    const local = path.join(LOCAL_BIN, process.platform === "win32" ? "yt-dlp.exe" : "yt-dlp");
+    if (fs.existsSync(local)) return local;
+    return "yt-dlp";
+  }
+  return name;
+}
+
+function getFfmpegLocation() {
+  if (process.env.FFMPEG_PATH) return process.env.FFMPEG_PATH;
+  if (fs.existsSync(path.join(LOCAL_BIN, "ffmpeg.exe")) || fs.existsSync(path.join(LOCAL_BIN, "ffmpeg"))) {
+    return LOCAL_BIN;
+  }
+  return null;
+}
+
+const YTDLP = resolveBinary("yt-dlp");
+const FFMPEG = resolveBinary("ffmpeg");
 const COOKIES = process.env.COOKIES_FILE || "";
 const MAX_AGE = 1000 * 60 * 60 * 2; // 2 hours
 const JOB_TIMEOUT = 1000 * 60 * 30;
@@ -287,14 +312,11 @@ function normalizeInfo(data) {
 function progressFromLine(line, job) {
   const tagged = line.match(/^KAPTR\s+([^|]+)\|([^|]*)\|([^|]*)\|([^|]*)/);
   if (tagged) {
-    const pct = parseFloat(tagged[1]);
+    const rawPct = tagged[1].replace(/%/g, "").trim();
+    const pct = parseFloat(rawPct);
     if (Number.isFinite(pct) && pct >= 0) job.percent = Math.min(100, pct);
-    const sp = parseFloat(tagged[2]);
-    if (Number.isFinite(sp) && sp > 0) job.speed = sp;
-    const eta = parseFloat(tagged[3]);
-    if (Number.isFinite(eta) && eta >= 0) job.eta = eta;
-    const total = parseFloat(tagged[4]);
-    if (Number.isFinite(total) && total > 0) job.size = total;
+    if (tagged[2] && tagged[2] !== "NA") job.speedLabel = tagged[2].trim();
+    if (tagged[3] && tagged[3] !== "NA") job.etaLabel = tagged[3].trim();
     return;
   }
   const m = line.match(/\[download\]\s+([\d.]+)%(?:\s+of\s+~?\s*([\d.]+\s*\w+))?(?:\s+at\s+([\d.]+\s*\w+\/s))?(?:\s+ETA\s+([\d:]+))?/);
@@ -345,9 +367,14 @@ async function startJob({ url, height, format, abr, title }) {
     "--no-playlist", "--no-warnings", "--newline", "--no-part",
     "--restrict-filenames", "--concurrent-fragments", "4",
     "--socket-timeout", "20", "--retries", "4",
-    "--progress-template", "download:KAPTR %(progress.percent)s|%(progress.speed)s|%(progress.eta)s|%(progress.total_bytes_estimate)s",
+    "--progress-template", "download:KAPTR %(progress._percent_str)s|%(progress._speed_str)s|%(progress._eta_str)s|%(progress._total_bytes_estimate_str)s",
     ...(COOKIES ? ["--cookies", COOKIES] : []),
   ];
+
+  const ffmpegLoc = getFfmpegLocation();
+  if (ffmpegLoc) {
+    args.push("--ffmpeg-location", ffmpegLoc);
+  }
 
   if (format === "mp3") {
     selector = "bestaudio/best";
@@ -357,9 +384,8 @@ async function startJob({ url, height, format, abr, title }) {
     selector = h > 0
       ? `bestvideo[height<=${h}]+bestaudio/best[height<=${h}]/best`
       : "bestvideo+bestaudio/best";
-    // Keep the best source streams; only the container is normalised.
+    // Merge source streams into mp4 or mkv
     args.push("-f", selector, "--merge-output-format", "mp4/mkv");
-    if (engine.ffmpeg) args.push("--remux-video", "mp4/mkv");
   }
 
   args.push("-o", path.join(dir, "video.%(ext)s"), url);
@@ -413,9 +439,16 @@ async function startJob({ url, height, format, abr, title }) {
         return;
       }
       const finalName = `${job.title}${path.extname(file.name) || ext}`;
-      const target = path.join(dir, finalName);
-      if (file.full !== target) await fsp.rename(file.full, target).catch(() => {});
-      job.filename = finalName;
+      let target = path.join(dir, finalName);
+      if (file.full !== target) {
+        try {
+          await fsp.rename(file.full, target);
+        } catch (renameErr) {
+          console.warn("Could not rename to target, using source filename:", renameErr.message);
+          target = file.full;
+        }
+      }
+      job.filename = path.basename(target);
       job.filePath = target;
       job.filesize = file.size;
       job.percent = 100;
