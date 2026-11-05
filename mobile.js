@@ -1,9 +1,11 @@
 #!/usr/bin/env node
 const { spawn, execSync } = require("child_process");
 const http = require("http");
+const https = require("https");
 const path = require("path");
 
 const ROOT = __dirname;
+const SUBDOMAIN = process.env.KAPTR_SUBDOMAIN || "kaptr-app";
 let serverProcess = null;
 let tunnelProcess = null;
 
@@ -12,6 +14,16 @@ function checkServer() {
     http.get("http://127.0.0.1:80/api/health", (res) => {
       resolve(res.statusCode === 200);
     }).on("error", () => resolve(false));
+  });
+}
+
+function getPublicIp() {
+  return new Promise((resolve) => {
+    https.get("https://api.ipify.org", (res) => {
+      let d = "";
+      res.on("data", (c) => (d += c));
+      res.on("end", () => resolve(d.trim()));
+    }).on("error", () => resolve(""));
   });
 }
 
@@ -57,40 +69,45 @@ process.on("exit", () => {
       stdio: "ignore",
       detached: false,
     });
-    // Wait 1 second for server to bind
     await new Promise((r) => setTimeout(r, 1200));
   } else {
     console.log("  ✓ Kaptr local engine is already active on port 80");
   }
 
-  console.log("  [2/2] Generating secure mobile link via Cloudflare...\n");
+  console.log(`  [2/2] Claiming permanent mobile link: https://${SUBDOMAIN}.loca.lt...\n`);
 
-  tunnelProcess = spawn("npx", ["--yes", "cloudflared", "tunnel", "--url", "http://127.0.0.1:80"], {
+  const publicIpPromise = getPublicIp();
+
+  tunnelProcess = spawn("npx", ["--yes", "localtunnel", "--port", "80", "--subdomain", SUBDOMAIN], {
     shell: true,
   });
 
   let foundUrl = false;
 
-  const handleOutput = (chunk) => {
+  const handleOutput = async (chunk) => {
     const text = chunk.toString();
-    const match = text.match(/https:\/\/[a-z0-9-]+\.trycloudflare\.com/i);
+    const match = text.match(/https:\/\/[a-z0-9-]+\.loca\.lt/i);
     if (match && !foundUrl) {
       foundUrl = true;
       const url = match[0];
       const copied = copyToClipboard(url);
+      const publicIp = await publicIpPromise;
 
       console.clear();
       console.log("\n  ========================================================================");
-      console.log("                       KAPTR — MOBILE LINK READY                        ");
+      console.log("                   KAPTR — PERMANENT MOBILE LINK READY                    ");
       console.log("  ========================================================================\n");
-      console.log("    Open this link on your phone (Safari / Chrome / Any Browser):\n");
+      console.log("    Permanent Link for your phone (Safari / Chrome / Any Browser):\n");
       console.log(`    👉  \x1b[36m\x1b[1m${url}\x1b[0m\n`);
       if (copied) {
         console.log("    \x1b[32m✓ Link copied to your Windows clipboard! (Paste to WhatsApp/chat)\x1b[0m\n");
       }
-      console.log("    • Works from anywhere (Wi-Fi, 4G, 5G).");
-      console.log("    • Fast, secure, and no passwords or verification needed.");
-      console.log("    • Add to Home Screen on your phone for a full-screen app experience.\n");
+      if (publicIp) {
+        console.log(`    \x1b[90mTunnel Password (if prompted once on phone): ${publicIp}\x1b[0m\n`);
+      }
+      console.log("    • THIS LINK NEVER CHANGES: Bookmark or 'Add to Home Screen' once.");
+      console.log("    • Works from anywhere in the world on mobile data (4G/5G) or Wi-Fi.");
+      console.log("    • Runs on demand: only active while this window is open.\n");
       console.log("    \x1b[33mPress Ctrl+C or close this window when you are done.\x1b[0m\n");
       console.log("  ========================================================================\n");
     }
@@ -101,7 +118,7 @@ process.on("exit", () => {
 
   tunnelProcess.on("close", (code) => {
     if (!foundUrl) {
-      console.error("\n  ! Could not establish tunnel (code " + code + "). Check internet connection.\n");
+      console.error("\n  ! Could not establish tunnel (code " + code + "). Retrying or check connection.\n");
     }
     cleanup();
   });
